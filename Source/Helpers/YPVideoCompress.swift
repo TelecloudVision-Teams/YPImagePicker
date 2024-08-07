@@ -10,16 +10,16 @@ import Foundation
 
 struct YPVideoCompress
 {
-    var compression:YPCompression?
+    var compression:Compression?
     mutating func compress(input:URL, completionHandler:@escaping(Result<URL,Error>)->Void, progress:@escaping(Double)->Void)
     {
         let fileURL = URL(fileURLWithPath: NSTemporaryDirectory())
             .appendingUniquePathComponent(pathExtension: YPConfig.video.fileType.fileExtension)
         try? FileManager.default.removeFileIfNecessary(at: fileURL)
         
-        let videoCompressor = YPVideoCompressor()
-        let config = YPVideoCompressor.Video.Configuration.init(quality: VideoQuality.medium, videoBitrateInMbps:1)
-        let video = YPVideoCompressor.Video.init(source: input, destination: fileURL, configuration: config)
+        let videoCompressor = VideoCompressor()
+        let config = VideoCompressor.Video.Configuration.init(quality: VideoQuality.medium, videoBitrateInMbps:1)
+        let video = VideoCompressor.Video.init(source: input, destination: fileURL, configuration: config)
         compression = videoCompressor.compressVideo(videos: [video],
                                                         progressQueue: .main,
                                                         progressHandler: { currentProgress in

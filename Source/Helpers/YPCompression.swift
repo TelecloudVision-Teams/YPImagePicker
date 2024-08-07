@@ -10,22 +10,22 @@ enum VideoQuality {
 }
 
 // Compression Result
-enum YPCompressionResult {
+enum CompressionResult {
     case onStart
     case onSuccess(Int, URL)
-    case onFailure(Int, YPCompressionError)
+    case onFailure(Int, CompressionError)
     case onCancelled
 }
 
 // Compression Interruption Wrapper
-class YPCompression {
+class Compression {
     init() {}
     
     var cancel = false
 }
 
 // Compression Error Messages
-struct YPCompressionError: LocalizedError {
+struct CompressionError: LocalizedError {
     let title: String
     
     init(title: String = "Compression Error") {
@@ -34,7 +34,7 @@ struct YPCompressionError: LocalizedError {
 }
 
 @available(iOS 14.0, *)
-public struct YPVideoCompressor {
+struct VideoCompressor {
     public struct Video {
         public struct Configuration {
             let quality: VideoQuality
@@ -102,8 +102,8 @@ public struct YPVideoCompressor {
     func compressVideo(videos: [Video],
                               progressQueue: DispatchQueue = .main,
                               progressHandler: ((Progress) -> ())?,
-                              completion: @escaping (YPCompressionResult) -> ()) -> YPCompression {
-        let compressionOperation = YPCompression()
+                              completion: @escaping (CompressionResult) -> ()) -> Compression {
+        let compressionOperation = Compression()
         
         guard !videos.isEmpty else {
             return compressionOperation
@@ -121,7 +121,7 @@ public struct YPVideoCompressor {
             
             let videoAsset = AVURLAsset(url: source)
             guard let videoTrack = videoAsset.tracks(withMediaType: AVMediaType.video).first else {
-                let error = YPCompressionError(title: "Cannot find video track")
+                let error = CompressionError(title: "Cannot find video track")
                 completion(.onFailure(index, error))
                 continue
             }
@@ -129,7 +129,7 @@ public struct YPVideoCompressor {
             let bitrate = videoTrack.estimatedDataRate
             // Check for a min video bitrate before compression
             if configuration.isMinBitrateCheckEnabled && bitrate <= MIN_BITRATE {
-                let error = YPCompressionError(title: "The provided bitrate is smaller than what is needed for compression try to set isMinBitRateEnabled to false")
+                let error = CompressionError(title: "The provided bitrate is smaller than what is needed for compression try to set isMinBitRateEnabled to false")
                 completion(.onFailure(index, error))
                 continue
             }
@@ -175,7 +175,7 @@ public struct YPVideoCompressor {
             do {
                 videoReader = try AVAssetReader(asset: videoAsset)
             } catch {
-                let compressionError = YPCompressionError(title: error.localizedDescription)
+                let compressionError = CompressionError(title: error.localizedDescription)
                 completion(.onFailure(index, compressionError))
                 continue
             }

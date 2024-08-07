@@ -1,7 +1,7 @@
 import AVFoundation
 import UIKit
 
-public enum VideoQuality {
+public enum YPVideoQuality {
     case very_high
     case high
     case medium
@@ -37,7 +37,7 @@ public struct YPCompressionError: LocalizedError {
 public struct YPVideoCompressor {
     public struct Video {
         public struct Configuration {
-            public let quality: VideoQuality
+            public let quality: YPVideoQuality
             public let isMinBitrateCheckEnabled: Bool
             public let videoBitrateInMbps: Int?
             public let disableAudio: Bool
@@ -45,7 +45,7 @@ public struct YPVideoCompressor {
             public let videoSize: CGSize?
             
             public init(
-                quality: VideoQuality = .medium,
+                quality: YPVideoQuality = .medium,
                 isMinBitrateCheckEnabled: Bool = true,
                 videoBitrateInMbps: Int? = nil,
                 disableAudio: Bool = false,
@@ -267,7 +267,7 @@ public struct YPVideoCompressor {
         return compressionOperation
     }
     
-    private func getBitrate(bitrate: Float, quality: VideoQuality) -> Int {
+    private func getBitrate(bitrate: Float, quality: YPVideoQuality) -> Int {
         switch quality {
         case .very_high:
             return Int(bitrate * 0.6)
