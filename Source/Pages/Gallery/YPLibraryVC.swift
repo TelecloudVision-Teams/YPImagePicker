@@ -56,7 +56,7 @@ internal final class YPLibraryVC: UIViewController, YPPermissionCheckable {
 
         v.assetViewContainer.multipleSelectionButton.isHidden = !(YPConfig.library.maxNumberOfItems > 1)
         v.maxNumberWarningLabel.text = String(format: YPConfig.wordings.warningMaxItemsLimit,
-											  YPConfig.library.maxNumberOfItems)
+                                              YPConfig.library.maxNumberOfItems)
         
         if let preselectedItems = YPConfig.library.preselectedItems,
            !preselectedItems.isEmpty {
@@ -300,7 +300,7 @@ internal final class YPLibraryVC: UIViewController, YPPermissionCheckable {
         let updateCropInfo = {
             self.updateCropInfo()
         }
-		
+        
         // MARK: add a func(updateCropInfo) after crop multiple
         DispatchQueue.global(qos: .userInitiated).async {
             switch asset.mediaType {
@@ -446,7 +446,8 @@ internal final class YPLibraryVC: UIViewController, YPPermissionCheckable {
                 }
                 return (asset, $0.cropRect)
             }
-            
+            self.mediaManager.videosSelected = selectedAssets.filter { $0.asset.mediaType == .video}.count
+
             // Multiple selection
             if self.isMultipleSelectionEnabled && self.selectedItems.count > 1 {
                 
@@ -465,7 +466,6 @@ internal final class YPLibraryVC: UIViewController, YPPermissionCheckable {
                 for (index, assetPair) in selectedAssets.enumerated() {
                     assetDictionary[assetPair.asset] = index
                 }
-                
                 for asset in selectedAssets {
                     asyncGroup.enter()
                     
@@ -473,7 +473,7 @@ internal final class YPLibraryVC: UIViewController, YPPermissionCheckable {
                     case .image:
                         self.fetchImageAndCrop(for: asset.asset, withCropRect: asset.cropRect) { image, exifMeta in
                             let photo = YPMediaPhoto(image: image.resizedImageIfNeeded(),
-													 exifMeta: exifMeta, asset: asset.asset)
+                                                     exifMeta: exifMeta, asset: asset.asset)
                             resultMediaItems.append(YPMediaItem.photo(p: photo))
                             asyncGroup.leave()
                         }

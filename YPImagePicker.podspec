@@ -9,7 +9,7 @@ Pod::Spec.new do |s|
   s.platform         = :ios
   s.source           = { :git => "https://github.com/Yummypets/YPImagePicker.git",
                          :tag => s.version.to_s }
-  s.ios.deployment_target = "12.0"
+  s.ios.deployment_target = "14.0"
   s.source_files = 'Source/**/*.swift'
   s.dependency 'SteviaLayout', '= 5.1.2'
   s.dependency 'PryntTrimmerView', '= 4.0.2'

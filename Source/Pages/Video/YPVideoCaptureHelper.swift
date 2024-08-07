@@ -254,6 +254,8 @@ class YPVideoCaptureHelper: NSObject {
     @objc
     func tick() {
         let timeElapsed = Date().timeIntervalSince(dateVideoStarted)
+        let timeRemaining = videoRecordingTimeLimit - timeElapsed
+
         var progress: Float
         if let recordingSizeLimit = YPConfig.video.recordingSizeLimit {
             progress = Float(videoOutput.recordedFileSize) / Float(recordingSizeLimit)
@@ -262,7 +264,7 @@ class YPVideoCaptureHelper: NSObject {
         }
         // VideoOutput configuration is responsible for stopping the recording. Not here.
         DispatchQueue.main.async {
-            self.videoRecordingProgress?(progress, timeElapsed)
+            self.videoRecordingProgress?(progress, timeRemaining)
         }
     }
     

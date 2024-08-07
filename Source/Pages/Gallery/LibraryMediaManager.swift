@@ -12,13 +12,18 @@ import Photos
 class LibraryMediaManager {
     
     weak var v: YPLibraryView?
+    var videosSelected = 0
     var collection: PHAssetCollection?
     internal var fetchResult: PHFetchResult<PHAsset>?
     internal var previousPreheatRect: CGRect = .zero
     internal var imageManager: PHCachingImageManager?
     internal var exportTimer: Timer?
     internal var currentExportSessions: [AVAssetExportSession] = []
-
+    private var downloadProgress = [String: Double]()
+    private var exportProgress = [String: Double]()
+    private var compressionProgress = [String: Double]()
+    private var compression = YPVideoCompress()
+    
     /// If true then library has items to show. If false the user didn't allow any item to show in picker library.
     internal var hasResultItems: Bool {
         if let fetchResult = self.fetchResult {
@@ -91,6 +96,12 @@ class LibraryMediaManager {
         let videosOptions = PHVideoRequestOptions()
         videosOptions.isNetworkAccessAllowed = true
         videosOptions.deliveryMode = .highQualityFormat
+        videosOptions.progressHandler = { [weak self] progress, error, _, _ in
+            DispatchQueue.main.async {
+                self?.updateDownloadProgress(progress, for: videoAsset.localIdentifier)
+            }
+        }
+        
         imageManager?.requestAVAsset(forVideo: videoAsset, options: videosOptions) { asset, _, _ in
             do {
                 guard let asset = asset else { ypLog("Don't have the asset"); return }
@@ -103,11 +114,10 @@ class LibraryMediaManager {
                 
                 guard let videoTrack = asset.tracks(withMediaType: AVMediaType.video).first,
                       let videoCompositionTrack = assetComposition
-                        .addMutableTrack(withMediaType: .video,
-                                         preferredTrackID: kCMPersistentTrackID_Invalid) else {
+                    .addMutableTrack(withMediaType: .video,
+                                     preferredTrackID: kCMPersistentTrackID_Invalid) else {
                     ypLog("Problems with video track")
                     return
-
                 }
                 if let audioTrack = asset.tracks(withMediaType: AVMediaType.audio).first,
                    let audioCompositionTrack = assetComposition
@@ -151,10 +161,20 @@ class LibraryMediaManager {
                             switch session.status {
                             case .completed:
                                 if let url = session.outputURL {
-                                    if let index = self?.currentExportSessions.firstIndex(of: session) {
-                                        self?.currentExportSessions.remove(at: index)
-                                    }
-                                    callback(url)
+                                    self?.compression.compress(input: url, completionHandler: { result in
+                                        switch result {
+                                        case .success(let file):
+                                            if let index = self?.currentExportSessions.firstIndex(of: session) {
+                                                self?.currentExportSessions.remove(at: index)
+                                            }
+                                            callback(file)
+                                        case .failure(let failure):
+                                            ypLog("\(failure.localizedDescription)")
+                                            callback(nil)
+                                        }
+                                    }, progress: { [weak self] progress in
+                                        self?.updateCompressionProgress(progress, for: videoAsset.localIdentifier)
+                                    })
                                 } else {
                                     ypLog("Don't have URL.")
                                     callback(nil)
@@ -168,16 +188,17 @@ class LibraryMediaManager {
                             }
                         }
                     }
-
+                
                 // 6. Exporting
                 DispatchQueue.main.async {
+                    let userInfo:[String:Any] = ["exportSession":exportSession as Any, "assetIdentifier":videoAsset.localIdentifier]
                     self.exportTimer = Timer.scheduledTimer(timeInterval: 0.1,
                                                             target: self,
                                                             selector: #selector(self.onTickExportTimer),
-                                                            userInfo: exportSession,
+                                                            userInfo: userInfo,
                                                             repeats: true)
                 }
-
+                
                 if let s = exportSession {
                     self.currentExportSessions.append(s)
                 }
@@ -187,9 +208,34 @@ class LibraryMediaManager {
         }
     }
     
+    private func updateDownloadProgress(_ progress: Double, for assetIdentifier: String) {
+        self.downloadProgress[assetIdentifier] = progress
+        updateCombinedProgress(for: assetIdentifier)
+    }
+
+    private func updateExportProgress(_ progress: Double, for assetIdentifier: String) {
+        self.exportProgress[assetIdentifier] = progress
+        updateCombinedProgress(for: assetIdentifier)
+    }
+
+    private func updateCompressionProgress(_ progress: Double, for assetIdentifier: String) {
+        self.compressionProgress[assetIdentifier] = progress
+        updateCombinedProgress(for: assetIdentifier)
+    }
+
+    private func updateCombinedProgress(for assetIdentifier: String, process:String = YPConfig.wordings.processing) {
+        let totalDownloadProgress = downloadProgress.values.reduce(0.0, +)
+        let totalExportProgress = exportProgress.values.reduce(0.0, +)
+        let totalCompressionProgress = compressionProgress.values.reduce(0.0, +)
+        let totalProgress = (totalDownloadProgress + totalExportProgress + totalCompressionProgress)/3
+        DispatchQueue.main.async {
+            self.v?.updateProgress(Float(totalProgress)/Float(self.videosSelected), process: process)
+        }
+    }
+
     private func getMaxVideoDuration(between duration: CMTime?, andAssetDuration assetDuration: CMTime) -> CMTime {
         guard let duration = duration else { return assetDuration }
-
+        
         if assetDuration <= duration {
             return assetDuration
         } else {
@@ -198,16 +244,18 @@ class LibraryMediaManager {
     }
     
     @objc func onTickExportTimer(sender: Timer) {
-        if let exportSession = sender.userInfo as? AVAssetExportSession {
-            if let v = v {
-                if exportSession.progress > 0 {
-                    v.updateProgress(exportSession.progress)
-                }
+        if let userInfo = sender.userInfo as? [String:Any],
+           let exportSession = userInfo["exportSession"] as? AVAssetExportSession,
+           let identifier = userInfo["assetIdentifier"] as? String
+        {
+            let exportProgress = Double(exportSession.progress)
+            
+            if exportProgress > 0 {
+                updateExportProgress(exportProgress, for: identifier)
             }
             
-            if exportSession.progress > 0.99 {
+            if exportProgress > 0.99 {
                 sender.invalidate()
-                v?.updateProgress(0)
                 self.exportTimer = nil
             }
         }
@@ -217,8 +265,9 @@ class LibraryMediaManager {
         for s in self.currentExportSessions {
             s.cancelExport()
         }
+        compression.cancel()
     }
-
+    
     func getAsset(at index: Int) -> PHAsset? {
         guard let fetchResult = fetchResult else {
             print("FetchResult not contain this index: \(index)")

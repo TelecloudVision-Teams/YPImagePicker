@@ -14,6 +14,7 @@ internal class YPVideoCaptureVC: UIViewController, YPPermissionCheckable {
     private let videoHelper = YPVideoCaptureHelper()
     private let v = YPCameraView(overlayView: nil)
     private var viewState = ViewState()
+    private var compression = YPVideoCompress()
     
     // MARK: - Init
     
@@ -23,13 +24,25 @@ internal class YPVideoCaptureVC: UIViewController, YPPermissionCheckable {
         super.init(nibName: nil, bundle: nil)
         title = YPConfig.wordings.videoTitle
         videoHelper.didCaptureVideo = { [weak self] videoURL in
-            self?.didCaptureVideo?(videoURL)
-            self?.resetVisualState()
+            self?.compression.compress(input: videoURL) { result in
+                switch result {
+                case .success(let url):
+                    self?.didCaptureVideo?(url)
+                    self?.resetVisualState()
+                case .failure(let error):
+                    print(error)
+                }
+            } progress: { progress in
+                self?.updateState {
+                    $0.progress = Float(progress)
+                }
+            }
         }
         videoHelper.videoRecordingProgress = { [weak self] progress, timeElapsed in
             self?.updateState {
-                $0.progress = progress
+                $0.progress = progress > 0.99 ? 0 : progress
                 $0.timeElapsed = timeElapsed
+                $0.isCompressing = progress > 0.99
             }
         }
     }
@@ -182,6 +195,7 @@ internal class YPVideoCaptureVC: UIViewController, YPPermissionCheckable {
     
     struct ViewState {
         var isRecording = false
+        var isCompressing = false
         var flashMode = FlashMode.noFlash
         var progress: Float = 0
         var timeElapsed: TimeInterval = 0
@@ -206,12 +220,21 @@ internal class YPVideoCaptureVC: UIViewController, YPPermissionCheckable {
         v.flashButton.isHidden = state.flashMode == .noFlash
         v.shotButton.setImage(state.isRecording ? YPConfig.icons.captureVideoOnImage : YPConfig.icons.captureVideoImage,
                               for: .normal)
+        v.spinnerView.isHidden = !state.isCompressing
         v.flipButton.isEnabled = !state.isRecording
+        v.shotButton.isEnabled = !state.isCompressing
         v.progressBar.progress = state.progress
         v.timeElapsedLabel.text = YPHelper.formattedStrigFrom(state.timeElapsed)
         
         // Animate progress bar changes.
-        UIView.animate(withDuration: 1, animations: v.progressBar.layoutIfNeeded)
+        if state.progress == 0
+        {
+            v.progressBar.layoutIfNeeded()
+        }
+        else
+        {
+            UIView.animate(withDuration: 1, animations: v.progressBar.layoutIfNeeded)
+        }
     }
     
     private func resetVisualState() {

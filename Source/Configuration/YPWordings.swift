@@ -31,6 +31,8 @@ public struct YPWordings {
     public var cancel = ypLocalized("YPImagePickerCancel")
     public var save = ypLocalized("YPImagePickerSave")
     public var processing = ypLocalized("YPImagePickerProcessing")
+    public var iCloudDownloading = ypLocalized("YPImagePickeriCloudDownloading")
+    public var compressing = ypLocalized("YPImagePickerCompressing")
     public var trim = ypLocalized("YPImagePickerTrim")
     public var cover = ypLocalized("YPImagePickerCover")
     public var albumsTitle = ypLocalized("YPImagePickerAlbums")

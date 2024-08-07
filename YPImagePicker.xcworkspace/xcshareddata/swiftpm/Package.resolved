@@ -1,4 +1,5 @@
 {
+  "originHash" : "5893ad229e65ee9df1b5f5ec326334c0377a99a8a84b3bd7d08f981451d962de",
   "pins" : [
     {
       "identity" : "prynttrimmerview",
@@ -19,5 +20,5 @@
       }
     }
   ],
-  "version" : 2
+  "version" : 3
 }

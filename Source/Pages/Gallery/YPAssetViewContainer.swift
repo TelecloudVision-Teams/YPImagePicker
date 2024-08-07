@@ -13,6 +13,7 @@ import AVFoundation
 
 /// The container for asset (video or image). It containts the YPGridView and YPAssetZoomableView.
 final class YPAssetViewContainer: UIView {
+    private var progressLabel = UILabel()
     public var zoomableView: YPAssetZoomableView
     public var itemOverlay: UIView?
     public let curtain = UIView()
@@ -32,7 +33,12 @@ final class YPAssetViewContainer: UIView {
     private var isMultipleSelectionEnabled = false
 
     public var itemOverlayType = YPConfig.library.itemOverlayType
-
+    public var currentProcess:String = YPConfig.wordings.iCloudDownloading
+    {
+        didSet {
+            progressLabel.text = currentProcess
+        }
+    }
     init(frame: CGRect, zoomableView: YPAssetZoomableView) {
         self.zoomableView = zoomableView
         super.init(frame: frame)
@@ -61,14 +67,18 @@ final class YPAssetViewContainer: UIView {
         addGestureRecognizer(touchDownGR)
 
         // TODO: Add tap gesture to play/pause. Add double tap gesture to square/unsquare
-
+        progressLabel.text = currentProcess
+        progressLabel.textColor = .white
+        progressLabel.textAlignment = .center
         subviews(
             spinnerView.subviews(
-                spinner
+                spinner,
+                progressLabel
             ),
             curtain
         )
-
+        progressLabel.Top == spinner.Bottom + 15
+        progressLabel.centerHorizontally()
         spinner.centerInContainer()
         spinnerView.fillContainer()
         curtain.fillContainer()

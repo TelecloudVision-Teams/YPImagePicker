@@ -130,9 +130,10 @@ internal final class YPLibraryView: UIView {
         assetViewContainer.spinnerView.alpha = 0
     }
 
-    func updateProgress(_ progress: Float) {
+    func updateProgress(_ progress: Float, process: String) {
         progressView.isHidden = progress > 0.99 || progress == 0
         progressView.progress = progress
+        assetViewContainer.currentProcess = process
         UIView.animate(withDuration: 0.1, animations: progressView.layoutIfNeeded)
     }
 

@@ -19,4 +19,4 @@
 "YPImagePickerVideoDurationTitle" = "مدة الفيديو";
 "YPImagePickerVideoTooLong" = "ثانية %@ اختار فيديو بمدة اقل من ";
 "YPImagePickerVideoTooShort" = "الفيديو يجب ان يكون على الآقل %@ ثانية";
-"YPImagePickerWarningItemsLimit" = "الحد المسموح هوه %d صورة او فيديو";
+"YPImagePickerWarningItemsLimit" = "الحد المسموح هو %d صورة او فيديو";

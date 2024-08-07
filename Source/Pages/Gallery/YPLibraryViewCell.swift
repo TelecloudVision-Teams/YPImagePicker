@@ -57,6 +57,7 @@ class YPLibraryViewCell: UICollectionViewCell {
     
     var representedAssetIdentifier: String!
     let imageView = UIImageView()
+    let checkMarkView = UIImageView()
     let durationLabel = UILabel()
     let selectionOverlay = UIView()
     let multipleSelectionIndicator = YPMultipleSelectionIndicator()
@@ -69,7 +70,8 @@ class YPLibraryViewCell: UICollectionViewCell {
             imageView,
             durationLabel,
             selectionOverlay,
-            multipleSelectionIndicator
+            multipleSelectionIndicator,
+            checkMarkView
         )
 
         imageView.fillContainer()
@@ -83,7 +85,12 @@ class YPLibraryViewCell: UICollectionViewCell {
             3,
             multipleSelectionIndicator-3-|
         )
-        
+        checkMarkView.contentMode = .scaleAspectFill
+        checkMarkView.clipsToBounds = true
+        checkMarkView.image = UIImage(systemName: "checkmark.circle.fill")?.withRenderingMode(.alwaysTemplate)
+        checkMarkView.tintColor = .ypSystemBlue
+        checkMarkView.top(3).right(3).width(20).height(20)
+
         imageView.contentMode = .scaleAspectFill
         imageView.clipsToBounds = true
         durationLabel.textColor = .white
@@ -105,6 +112,7 @@ class YPLibraryViewCell: UICollectionViewCell {
     
     private func refreshSelection() {
         let showOverlay = isSelected || isHighlighted
+        checkMarkView.isHidden = !(showOverlay && multipleSelectionIndicator.isHidden)
         selectionOverlay.alpha = showOverlay ? 0.6 : 0
     }
 

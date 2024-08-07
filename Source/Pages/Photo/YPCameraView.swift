@@ -18,15 +18,26 @@ internal class YPCameraView: UIView, UIGestureRecognizerDelegate {
     let flashButton = UIButton()
     let timeElapsedLabel = UILabel()
     let progressBar = UIProgressView()
+    let spinnerView = UIView()
     
     convenience init(overlayView: UIView? = nil) {
         self.init(frame: .zero)
+        
+        spinnerView.backgroundColor = UIColor(white: 0, alpha: 0.5)
+        let spinner = UIActivityIndicatorView()
+        spinner.startAnimating()
+        spinner.color = .white
+        spinnerView.subviews(spinner)
+        spinner.centerVertically()
+        spinner.centerHorizontally()
+        spinnerView.isHidden = true
         
         if let overlayView = overlayView {
             // View Hierarchy
             subviews(
                 previewViewContainer,
                 overlayView,
+                spinnerView,
                 progressBar,
                 timeElapsedLabel,
                 flashButton,
@@ -39,6 +50,7 @@ internal class YPCameraView: UIView, UIGestureRecognizerDelegate {
             // View Hierarchy
             subviews(
                 previewViewContainer,
+                spinnerView,
                 progressBar,
                 timeElapsedLabel,
                 flashButton,
@@ -79,7 +91,7 @@ internal class YPCameraView: UIView, UIGestureRecognizerDelegate {
             buttonsContainer.height(100)
             buttonsContainer.Bottom == previewViewContainer.Bottom - 50
         }
-        
+        spinnerView.followEdges(previewViewContainer)
         overlayView?.followEdges(previewViewContainer)
         
         |-(15+sideMargin)-flashButton.size(42)
