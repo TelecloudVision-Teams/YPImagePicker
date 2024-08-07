@@ -1,7 +1,7 @@
 import AVFoundation
 import UIKit
 
-public enum VideoQuality {
+enum VideoQuality {
     case very_high
     case high
     case medium
@@ -10,7 +10,7 @@ public enum VideoQuality {
 }
 
 // Compression Result
-public enum YPCompressionResult {
+enum YPCompressionResult {
     case onStart
     case onSuccess(Int, URL)
     case onFailure(Int, YPCompressionError)
@@ -18,15 +18,15 @@ public enum YPCompressionResult {
 }
 
 // Compression Interruption Wrapper
-public class YPCompression {
-    public init() {}
+class YPCompression {
+    init() {}
     
-    public var cancel = false
+    var cancel = false
 }
 
 // Compression Error Messages
-public struct YPCompressionError: LocalizedError {
-    public let title: String
+struct YPCompressionError: LocalizedError {
+    let title: String
     
     init(title: String = "Compression Error") {
         self.title = title
@@ -37,14 +37,14 @@ public struct YPCompressionError: LocalizedError {
 public struct YPVideoCompressor {
     public struct Video {
         public struct Configuration {
-            public let quality: VideoQuality
-            public let isMinBitrateCheckEnabled: Bool
-            public let videoBitrateInMbps: Int?
-            public let disableAudio: Bool
-            public let keepOriginalResolution: Bool
-            public let videoSize: CGSize?
+            let quality: VideoQuality
+            let isMinBitrateCheckEnabled: Bool
+            let videoBitrateInMbps: Int?
+            let disableAudio: Bool
+            let keepOriginalResolution: Bool
+            let videoSize: CGSize?
             
-            public init(
+            init(
                 quality: VideoQuality = .medium,
                 isMinBitrateCheckEnabled: Bool = true,
                 videoBitrateInMbps: Int? = nil,
@@ -61,10 +61,10 @@ public struct YPVideoCompressor {
             }
         }
         
-        public let source: URL
-        public let destination: URL
-        public let configuration: Configuration
-        public init(
+        let source: URL
+        let destination: URL
+        let configuration: Configuration
+        init(
             source: URL,
             destination: URL,
             configuration: Configuration = Configuration()
@@ -75,11 +75,11 @@ public struct YPVideoCompressor {
         }
     }
     
-    public init() {}
+    init() {}
     
-    private let MIN_BITRATE = Float(2000000)
-    private let MIN_HEIGHT = 640.0
-    private let MIN_WIDTH = 360.0
+    let MIN_BITRATE = Float(2000000)
+    let MIN_HEIGHT = 640.0
+    let MIN_WIDTH = 360.0
     
     /**
      * This function compresses a given list of [video]  files and writes the compressed video file at
@@ -99,7 +99,7 @@ public struct YPVideoCompressor {
      * and if the compression was [onCancelled]
      */
     
-    public func compressVideo(videos: [Video],
+    func compressVideo(videos: [Video],
                               progressQueue: DispatchQueue = .main,
                               progressHandler: ((Progress) -> ())?,
                               completion: @escaping (YPCompressionResult) -> ()) -> YPCompression {

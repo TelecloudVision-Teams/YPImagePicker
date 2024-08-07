@@ -91,7 +91,7 @@
 		EBA37B0B26F73080005DAAD4 /* YPAlbumCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = EBA37B0626F73080005DAAD4 /* YPAlbumCell.swift */; };
 		EBA37B0C26F73080005DAAD4 /* YPAlbumsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = EBA37B0726F73080005DAAD4 /* YPAlbumsManager.swift */; };
 		EBA37B0D26F73080005DAAD4 /* YPAlbumView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EBA37B0826F73080005DAAD4 /* YPAlbumView.swift */; };
-		EBA37B3026F74228005DAAD4 /* BuildFile in Embed Frameworks */ = {isa = PBXBuildFile; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		EBA37B3026F74228005DAAD4 /* (null) in Embed Frameworks */ = {isa = PBXBuildFile; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		EBA37B5226F749C6005DAAD4 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = EBA37B5126F749C6005DAAD4 /* AppDelegate.swift */; };
 		EBA37B5B26F749C7005DAAD4 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = EBA37B5A26F749C7005DAAD4 /* Assets.xcassets */; };
 		EBA37B5E26F749C7005DAAD4 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = EBA37B5C26F749C7005DAAD4 /* LaunchScreen.storyboard */; };
@@ -206,7 +206,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				EBA37B3026F74228005DAAD4 /* BuildFile in Embed Frameworks */,
+				EBA37B3026F74228005DAAD4 /* (null) in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -437,9 +437,10 @@
 		99019E542018CECC007325C2 /* Helpers */ = {
 			isa = PBXGroup;
 			children = (
-				84ED35AE2C635D7A001AB73C /* YPCompression.swift */,
 				EB473E2C208E1ED800D16105 /* Extensions */,
 				EBA37AF526F7300C005DAAD4 /* Permissions */,
+				84ED35AE2C635D7A001AB73C /* YPCompression.swift */,
+				84ED35B32C6390C7001AB73C /* YPVideoCompress.swift */,
 				99CF6D26201B739600487F77 /* YPAlerts.swift */,
 				AA69BCF122E601D100FBB925 /* YPDeviceOrientationHelper.swift */,
 				99C6D6B11F1FB5C100711DB2 /* YPHelper.swift */,
@@ -447,7 +448,6 @@
 				99B8C4C2208F8EE900127119 /* YPLoadingView.swift */,
 				99C6D6B41F1FB5C100711DB2 /* YPPhotoSaver.swift */,
 				EB05F6E6214A7191002040AA /* YPVideoProcessor.swift */,
-				84ED35B32C6390C7001AB73C /* YPVideoCompress.swift */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
