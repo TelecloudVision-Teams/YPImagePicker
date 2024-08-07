@@ -1,11 +1,16 @@
 source 'https://github.com/CocoaPods/Specs.git'
 platform :ios, '14.0'
-use_frameworks!
 
+def pods
+    pod 'SteviaLayout', '= 5.1.2'
+    pod 'PryntTrimmerView', '= 4.0.2'
+end
 target 'Example' do
+    use_frameworks!
+    pods
+end
 
-  # Pods for YPImagePickerExample
-  pod 'SteviaLayout', '= 5.1.2'
-  pod 'PryntTrimmerView', '= 4.0.2'
-
+target 'YPImagePicker' do
+    use_frameworks!
+    pods
 end
