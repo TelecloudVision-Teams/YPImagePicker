@@ -39,7 +39,7 @@ struct VideoCompressor {
         public struct Configuration {
             let quality: VideoQuality
             let isMinBitrateCheckEnabled: Bool
-            let videoBitrateInMbps: Int?
+            let videoBitrateInKbps: Int?
             let disableAudio: Bool
             let keepOriginalResolution: Bool
             let videoSize: CGSize?
@@ -47,14 +47,14 @@ struct VideoCompressor {
             init(
                 quality: VideoQuality = .medium,
                 isMinBitrateCheckEnabled: Bool = true,
-                videoBitrateInMbps: Int? = nil,
+                videoBitrateInKbps: Int? = nil,
                 disableAudio: Bool = false,
                 keepOriginalResolution: Bool = false,
                 videoSize: CGSize? = nil
             ) {
                 self.quality = quality
                 self.isMinBitrateCheckEnabled = isMinBitrateCheckEnabled
-                self.videoBitrateInMbps = videoBitrateInMbps
+                self.videoBitrateInKbps = videoBitrateInKbps
                 self.disableAudio = disableAudio
                 self.keepOriginalResolution = keepOriginalResolution
                 self.videoSize = videoSize
@@ -77,7 +77,7 @@ struct VideoCompressor {
     
     init() {}
     
-    let MIN_BITRATE = Float(2000000)
+    let MIN_BITRATE = Float(800000)
     let MIN_HEIGHT = 640.0
     let MIN_WIDTH = 360.0
     
@@ -135,9 +135,9 @@ struct VideoCompressor {
             }
             
             // Generate a bitrate based on desired quality
-            let newBitrate = configuration.videoBitrateInMbps == nil ?
+            let newBitrate = configuration.videoBitrateInKbps == nil ?
             getBitrate(bitrate: bitrate, quality: configuration.quality) :
-            configuration.videoBitrateInMbps! * 1000000
+            configuration.videoBitrateInKbps!
             
             // Handle new width and height values
             let videoSize = videoTrack.naturalSize

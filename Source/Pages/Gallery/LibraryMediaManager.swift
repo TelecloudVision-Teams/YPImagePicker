@@ -169,8 +169,14 @@ class LibraryMediaManager {
                                             }
                                             callback(file)
                                         case .failure(let failure):
+                                            // In case of compression Error, return back the original file
+                                            // Deal with it at the business logic of the application
+                                            if let index = self?.currentExportSessions.firstIndex(of: session) {
+                                                self?.currentExportSessions.remove(at: index)
+                                            }
+                                            self?.updateCompressionProgress(100, for: videoAsset.localIdentifier)
                                             ypLog("\(failure.localizedDescription)")
-                                            callback(nil)
+                                            callback(url)
                                         }
                                     }, progress: { [weak self] progress in
                                         self?.updateCompressionProgress(progress, for: videoAsset.localIdentifier)

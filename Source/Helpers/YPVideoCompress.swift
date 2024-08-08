@@ -18,7 +18,7 @@ struct YPVideoCompress
         try? FileManager.default.removeFileIfNecessary(at: fileURL)
         
         let videoCompressor = VideoCompressor()
-        let config = VideoCompressor.Video.Configuration.init(quality: VideoQuality.medium, videoBitrateInMbps:1)
+        let config = VideoCompressor.Video.Configuration.init(videoBitrateInKbps:800000)
         let video = VideoCompressor.Video.init(source: input, destination: fileURL, configuration: config)
         compression = videoCompressor.compressVideo(videos: [video],
                                                         progressQueue: .main,
