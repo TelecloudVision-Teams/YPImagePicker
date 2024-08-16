@@ -14,7 +14,8 @@ import AVFoundation
 /// Supports xib initialization.
 public class YPVideoView: UIView {
     public let playImageView = UIImageView(image: nil)
-    
+    public var autoPlayOn = false
+    public var replayOnVideoEnd = false
     internal let playerView = UIView()
     internal let playerLayer = AVPlayerLayer()
     internal var previewImageView = UIImageView()
@@ -48,7 +49,6 @@ public class YPVideoView: UIView {
         playImageView.alpha = 0.8
         playerLayer.videoGravity = .resizeAspect
         previewImageView.contentMode = .scaleAspectFit
-        
         subviews(
             previewImageView,
             playerView,
@@ -112,7 +112,10 @@ extension YPVideoView {
     public func play() {
         player.play()
         showPlayImage(show: false)
-        addReachEndObserver()
+        if replayOnVideoEnd
+        {
+            addReachEndObserver()
+        }
     }
     
     public func pause() {
@@ -124,7 +127,11 @@ extension YPVideoView {
         player.pause()
         player.seek(to: CMTime.zero)
         showPlayImage(show: true)
-        removeReachEndObserver()
+        
+        if replayOnVideoEnd
+        {
+            removeReachEndObserver()
+        }
     }
     
     public func deallocate() {

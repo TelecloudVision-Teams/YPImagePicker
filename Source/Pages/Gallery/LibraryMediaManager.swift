@@ -15,6 +15,7 @@ class LibraryMediaManager {
     var videosSelected = 0
     var collection: PHAssetCollection?
     internal var fetchResult: PHFetchResult<PHAsset>?
+    internal var reversedFetchResult: [PHAsset]?
     internal var previousPreheatRect: CGRect = .zero
     internal var imageManager: PHCachingImageManager?
     internal var exportTimer: Timer?
@@ -174,7 +175,6 @@ class LibraryMediaManager {
                                             if let index = self?.currentExportSessions.firstIndex(of: session) {
                                                 self?.currentExportSessions.remove(at: index)
                                             }
-                                            self?.updateCompressionProgress(100, for: videoAsset.localIdentifier)
                                             ypLog("\(failure.localizedDescription)")
                                             callback(url)
                                         }
@@ -275,7 +275,7 @@ class LibraryMediaManager {
     }
     
     func getAsset(at index: Int) -> PHAsset? {
-        guard let fetchResult = fetchResult else {
+        guard let fetchResult = reversedFetchResult else {
             print("FetchResult not contain this index: \(index)")
             return nil
         }
@@ -283,6 +283,6 @@ class LibraryMediaManager {
             print("FetchResult not contain this index: \(index)")
             return nil
         }
-        return fetchResult.object(at: index)
+        return fetchResult[index]
     }
 }

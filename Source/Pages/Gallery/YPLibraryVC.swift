@@ -229,21 +229,52 @@ internal final class YPLibraryVC: UIViewController, YPPermissionCheckable {
     }
     
     func refreshMediaRequest() {
+        // Build the fetch options
         let options = buildPHFetchOptions()
 
-        if let collection = mediaManager.collection {
-            mediaManager.fetchResult = PHAsset.fetchAssets(in: collection, options: options)
+        // Fetch the "Recents" album
+        let recentsAlbum = PHAssetCollection.fetchAssetCollections(with: .smartAlbum, subtype: .smartAlbumUserLibrary, options: nil).firstObject
+
+        var reversedAssetsArray: [PHAsset] = []
+
+        if let recents = recentsAlbum {
+            // Fetch assets from the "Recents" album
+            let fetchResult = PHAsset.fetchAssets(in: recents, options: options)
+            mediaManager.fetchResult = fetchResult
+
+            // Convert PHFetchResult to array and reverse it
+            reversedAssetsArray = fetchResult.objects(at: IndexSet(integersIn: 0..<fetchResult.count)).reversed()
+        } else if let collection = mediaManager.collection {
+            // Fallback: Fetch assets from the specified collection
+            let fetchResult = PHAsset.fetchAssets(in: collection, options: options)
+            mediaManager.fetchResult = fetchResult
+
+            // Convert PHFetchResult to array and reverse it
+            reversedAssetsArray = fetchResult.objects(at: IndexSet(integersIn: 0..<fetchResult.count)).reversed()
         } else {
-            mediaManager.fetchResult = PHAsset.fetchAssets(with: options)
+            // Fallback: Fetch all assets (if no specific collection is provided)
+            let fetchResult = PHAsset.fetchAssets(with: options)
+            mediaManager.fetchResult = fetchResult
+
+            // Convert PHFetchResult to array and reverse it
+            reversedAssetsArray = fetchResult.objects(at: IndexSet(integersIn: 0..<fetchResult.count)).reversed()
         }
-        
-        if mediaManager.hasResultItems,
-        let firstAsset = mediaManager.getAsset(at: 0) {
-            changeAsset(firstAsset)
+
+        // Update the UI with the reversed array
+        if !reversedAssetsArray.isEmpty {
+            // Display the first item from the reversed array
+            mediaManager.reversedFetchResult = reversedAssetsArray
+            changeAsset(reversedAssetsArray.first!)
+
+            // Reload the collection view with the reversed assets
             v.collectionView.reloadData()
+
+            // Optionally pre-select the first item
             v.collectionView.selectItem(at: IndexPath(row: 0, section: 0),
                                         animated: false,
-                                        scrollPosition: UICollectionView.ScrollPosition())
+                                        scrollPosition: .top)
+
+            // Handle selection for multiple selection mode
             if !isMultipleSelectionEnabled && YPConfig.library.preSelectItemOnMultipleSelection {
                 addToSelection(indexPath: IndexPath(row: 0, section: 0))
             }
@@ -253,7 +284,7 @@ internal final class YPLibraryVC: UIViewController, YPPermissionCheckable {
 
         scrollToTop()
     }
-    
+
     func buildPHFetchOptions() -> PHFetchOptions {
         // Sorting condition
         if let userOpt = YPConfig.library.options {
@@ -261,7 +292,7 @@ internal final class YPLibraryVC: UIViewController, YPPermissionCheckable {
         }
 
         let options = PHFetchOptions()
-        options.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: false)]
+//        options.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: false)]
         options.predicate = YPConfig.library.mediaType.predicate()
         return options
     }
