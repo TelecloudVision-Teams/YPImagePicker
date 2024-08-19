@@ -62,12 +62,13 @@ final class YPAssetZoomableView: UIScrollView {
                          storedCropPosition: YPLibrarySelection?,
                          completion: @escaping () -> Void,
                          updateCropInfo: @escaping () -> Void) {
+        
+        isVideoMode = true
         mediaManager.imageManager?.fetchPreviewFor(video: video) { [weak self] preview in
             guard let strongSelf = self else { return }
-            guard strongSelf.currentAsset != video else { completion() ; return }
+            guard strongSelf.currentAsset != video, strongSelf.isVideoMode == true else { completion() ; return }
             
             if strongSelf.videoView.isDescendant(of: strongSelf) == false {
-                strongSelf.isVideoMode = true
                 strongSelf.photoImageView.removeFromSuperview()
                 strongSelf.addSubview(strongSelf.videoView)
             }
@@ -89,7 +90,7 @@ final class YPAssetZoomableView: UIScrollView {
         }
         mediaManager.imageManager?.fetchPlayerItem(for: video) { [weak self] playerItem in
             guard let strongSelf = self else { return }
-            guard strongSelf.currentAsset != video else { completion() ; return }
+            guard strongSelf.currentAsset != video, strongSelf.isVideoMode == true else { completion() ; return }
             strongSelf.currentAsset = video
 
             strongSelf.videoView.loadVideo(playerItem)
@@ -115,15 +116,16 @@ final class YPAssetZoomableView: UIScrollView {
             return
         }
         currentAsset = photo
+        isVideoMode = false
         
         mediaManager.imageManager?.fetch(photo: photo) { [weak self] image, isLowResIntermediaryImage in
-            guard let strongSelf = self else { return }
+            guard let strongSelf = self, strongSelf.isVideoMode == false else { return }
+            
+            strongSelf.videoView.removeFromSuperview()
+            strongSelf.videoView.showPlayImage(show: false)
+            strongSelf.videoView.deallocate()
             
             if strongSelf.photoImageView.isDescendant(of: strongSelf) == false {
-                strongSelf.isVideoMode = false
-                strongSelf.videoView.removeFromSuperview()
-                strongSelf.videoView.showPlayImage(show: false)
-                strongSelf.videoView.deallocate()
                 strongSelf.addSubview(strongSelf.photoImageView)
             
                 strongSelf.photoImageView.contentMode = .scaleAspectFill
