@@ -15,6 +15,7 @@ class YPVideoCaptureHelper: NSObject {
     public var isRecording: Bool {
         return videoOutput.isRecording
     }
+    public var didStopRecording: (()->Void)?
     public var didCaptureVideo: ((URL) -> Void)?
     public var videoRecordingProgress: ((Float, TimeInterval) -> Void)?
     
@@ -202,6 +203,7 @@ class YPVideoCaptureHelper: NSObject {
     }
     
     public func stopRecording() {
+        didStopRecording?()
         videoOutput.stopRecording()
     }
     

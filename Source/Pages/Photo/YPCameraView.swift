@@ -26,7 +26,7 @@ internal class YPCameraView: UIView, UIGestureRecognizerDelegate {
         spinnerView.backgroundColor = UIColor(white: 0, alpha: 0.5)
         let spinner = UIActivityIndicatorView()
         spinner.startAnimating()
-        spinner.color = .white
+        spinner.color = .gray
         spinnerView.subviews(spinner)
         spinner.centerVertically()
         spinner.centerHorizontally()
