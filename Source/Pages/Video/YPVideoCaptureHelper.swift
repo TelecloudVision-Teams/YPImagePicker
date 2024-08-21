@@ -238,8 +238,7 @@ class YPVideoCaptureHelper: NSObject {
                 videoOutput.maxRecordedFileSize = sizeLimit
             }
             videoOutput.minFreeDiskSpaceLimit = YPConfig.video.minFreeDiskSpaceLimit
-            if YPConfig.video.fileType == .mp4,
-               YPConfig.video.recordingSizeLimit != nil {
+            if YPConfig.video.fileType == .mp4 {
                 videoOutput.movieFragmentInterval = .invalid // Allows audio for MP4s over 10 seconds.
             }
             if session.canAddOutput(videoOutput) {
@@ -329,7 +328,11 @@ extension YPVideoCaptureHelper: AVCaptureFileOutputRecordingDelegate {
         if let error = error {
             ypLog("Error: \(error)")
         }
-
+        let asset = AVAsset(url: outputFileURL)
+        let audioTracks = asset.tracks(withMediaType: .audio)
+        if audioTracks.isEmpty {
+            ypLog("No audio tracks found in the recorded video.")
+        }
         if YPConfig.onlySquareImagesFromCamera {
             YPVideoProcessor.cropToSquare(filePath: outputFileURL) { [weak self] url in
                 guard let _self = self, let u = url else { return }
@@ -338,6 +341,7 @@ extension YPVideoCaptureHelper: AVCaptureFileOutputRecordingDelegate {
         } else {
             self.didCaptureVideo?(outputFileURL)
         }
+        didStopRecording?()
         timer.invalidate()
     }
 }

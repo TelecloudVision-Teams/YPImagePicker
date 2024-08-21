@@ -24,15 +24,16 @@ internal class YPVideoCaptureVC: UIViewController, YPPermissionCheckable {
         super.init(nibName: nil, bundle: nil)
         title = YPConfig.wordings.videoTitle
         videoHelper.didStopRecording = { [weak self] in
-            self?.v.shotButton.isEnabled = false
-            self?.v.spinnerView.isHidden = false
+            self?.updateState(block: {
+                $0.isCompressing = true
+                $0.isRecording = false
+            })
         }
         videoHelper.didCaptureVideo = { [weak self] videoURL in
             self?.compression.compress(input: videoURL) { result in
                 switch result {
                 case .success(let url):
                     self?.didCaptureVideo?(url)
-                    self?.resetVisualState()
                 case .failure(let error):
                     print(error)
                 }
@@ -224,6 +225,7 @@ internal class YPVideoCaptureVC: UIViewController, YPPermissionCheckable {
         v.shotButton.setImage(state.isRecording ? YPConfig.icons.captureVideoOnImage : YPConfig.icons.captureVideoImage,
                               for: .normal)
         v.spinnerView.isHidden = !state.isCompressing
+        v.shotButton.isEnabled = !state.isCompressing
         v.flipButton.isEnabled = !state.isRecording
         v.progressBar.progress = state.progress
         v.timeElapsedLabel.text = YPHelper.formattedStrigFrom(state.timeElapsed)
