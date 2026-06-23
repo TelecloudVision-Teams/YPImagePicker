@@ -6,6 +6,7 @@
 
 # Xcode
 build/
+Build/
 *.pbxuser
 !default.pbxuser
 *.mode1v3
@@ -19,6 +20,7 @@ xcuserdata
 profile
 *.moved-aside
 DerivedData
+*.xcuserstate
 *.hmap
 *.ipa
 
@@ -41,3 +43,9 @@ Pods/
 
 
 *.lock
+
+# Swift Package Manager
+.build/
+.swiftpm/
+Package.resolved
+Packages/
